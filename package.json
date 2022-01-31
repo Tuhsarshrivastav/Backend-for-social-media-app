@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
- "start": "nodemon server.js"
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -18,8 +18,10 @@
   },
   "homepage": "https://github.com/Tuhsarshrivastav/Backend-for-social-media-app#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "dotenv": "^14.3.2",
     "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.1.8"
   }
 }
