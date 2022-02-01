@@ -85,14 +85,32 @@ exports.followUser = async (req, res) => {
         message: "User not found",
       });
     }
-    loginedUser.following.push(userToFollow._id);
-    userToFollow.followers.push(loginedUser._id);
-    await loginedUser.save();
-    await userToFollow.save();
-    res.status(200).json({
-      success: true,
-      message: "User followed",
-    });
+    if (loginedUser.following.includes(userToFollow._id)) {
+      const indexFollowing = loginedUser.following.indexOf(userToFollow._id);
+      const indexFollowers = userToFollow.followers.indexOf(loginedUser._id);
+
+      loginedUser.following.splice(indexFollowing, 1);
+      userToFollow.followers.splice(indexFollowers, 1);
+
+      await loginedUser.save();
+      await userToFollow.save();
+
+      res.status(200).json({
+        success: true,
+        message: "User unfollowed",
+      });
+    } else {
+      loginedUser.following.push(userToFollow._id);
+      userToFollow.followers.push(loginedUser._id);
+
+      await loginedUser.save();
+      await userToFollow.save();
+
+      res.status(200).json({
+        success: true,
+        message: "User followed",
+      });
+    }
   } catch (error) {
     res.status(500).json({
       success: false,
