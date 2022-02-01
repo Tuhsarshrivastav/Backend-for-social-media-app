@@ -24,7 +24,15 @@ exports.register = async (req, res) => {
         url: "url",
       },
     });
-    res.status(201).json({ success: true, user });
+    const token = await user.generateAuthToken();
+    const options = {
+      exppres: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+      httpOnly: true,
+    };
+    res
+      .status(200)
+      .cookie("token", token, options)
+      .json({ success: true, user, token });
   } catch (error) {
     res.status(500).json({
       success: false,
