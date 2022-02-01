@@ -51,7 +51,14 @@ exports.login = async (req, res) => {
       });
     }
     const token = await user.generateAuthToken();
-    res.status(200).cookie("token", token).json({ success: true, user, token });
+    const options = {
+      exppres: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+      httpOnly: true,
+    };
+    res
+      .status(200)
+      .cookie("token", token, options)
+      .json({ success: true, user, token });
   } catch (error) {
     res.status(500).json({
       success: false,
