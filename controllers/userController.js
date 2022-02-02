@@ -195,3 +195,30 @@ exports.updateProfile = async (req, res) => {
     });
   }
 };
+exports.deleteMyProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const posts = user.posts;
+    await user.remove();
+
+    // logout user after deleteing profile
+    res
+      .status(200)
+      .cookie("token", null, { expires: new Date(Date.now()), httpOnly: true });
+
+    // delete all posts of the user
+    for (let i = 0; i < posts.length; i++) {
+      const post = await Post.findById(posts[i]);
+      await post.remove();
+    }
+    res.status(200).json({
+      success: true,
+      message: "Profile deleted",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
