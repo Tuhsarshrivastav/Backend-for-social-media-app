@@ -140,6 +140,12 @@ exports.updatePassword = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+      res.status(400).json({
+        success: false,
+        message: "Please fill all the inputs",
+      });
+    }
     const isMatch = await user.matchPassword(oldPassword);
     if (!isMatch) {
       return res.status(400).json({
@@ -165,6 +171,12 @@ exports.updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     const { name, email } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill all the inputs",
+      });
+    }
     if (name) {
       user.name = name;
     }
