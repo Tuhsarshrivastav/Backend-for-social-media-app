@@ -199,6 +199,9 @@ exports.deleteMyProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     const posts = user.posts;
+    const userId = user._id;
+    const followers = user.followers;
+    const following = user.following;
     await user.remove();
 
     // logout user after deleteing profile
@@ -211,9 +214,60 @@ exports.deleteMyProfile = async (req, res) => {
       const post = await Post.findById(posts[i]);
       await post.remove();
     }
+    // removing user from folllowers and following
+    for (let i = 0; i < followers.length; i++) {
+      const follwer = await User.findById(followers[i]);
+      const index = follwer.following.indexOf(userId);
+      follwer.following.splice(index, 1);
+      await follwer.save();
+    }
+
+    // removing user from   following follwers
+    for (let i = 0; i < following.length; i++) {
+      const follows = await User.findById(following[i]);
+      const index = follows.followers.indexOf(userId);
+      follows.followers.splice(index, 1);
+      await follows.save();
+    }
     res.status(200).json({
       success: true,
       message: "Profile deleted",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.myProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).populate("posts");
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).populate("posts");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      user,
     });
   } catch (error) {
     res.status(500).json({
